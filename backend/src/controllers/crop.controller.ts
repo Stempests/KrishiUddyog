@@ -16,7 +16,8 @@ export const cropController = {
   }),
 
   getSeasonalCalendar: asyncHandler(async (req: Request, res: Response) => {
-    const state = req.query.state as string || req.user?.['location']?.state || 'Unknown';
+    const userReq = req as Request & { user?: { _id: string; role: string; name: string; language: string; location?: { state: string } } };
+    const state = req.query.state as string || userReq.user?.location?.state || 'Unknown';
     const calendar = cropService.getSeasonalCalendar(state);
     sendSuccess(res, { state, calendar }, 'Seasonal calendar fetched');
   }),
