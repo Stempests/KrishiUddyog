@@ -22,7 +22,7 @@ export const reverseGeocode = async (lat: number, lng: number): Promise<GeocodeR
         addressdetails: 1,
       },
       headers: {
-        'User-Agent': 'KrishiUddyogAI/1.0 (hackathon project)',
+        'User-Agent': 'AgriConnectIndia/1.0',
       },
       timeout: 5000,
     });

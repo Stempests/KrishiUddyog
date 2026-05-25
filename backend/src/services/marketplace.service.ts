@@ -70,7 +70,7 @@ export const marketplaceService = {
       try {
         const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
           const stream = cloudinary.uploader.upload_stream(
-            { folder: 'krishiuddyog/marketplace' },
+            { folder: 'agriconnect/marketplace' },
             (err, res) => { if (err || !res) reject(err); else resolve(res as { secure_url: string }); }
           );
           stream.end(buffer);

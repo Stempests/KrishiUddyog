@@ -32,7 +32,7 @@ app.use('/api', rateLimiter);
 app.get('/health', (_req: Request, res: Response) => {
   res.status(200).json({
     success: true,
-    message: '🌾 KrishiUddyog API is healthy',
+    message: '🌾 AgriConnect India API is healthy',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
   });

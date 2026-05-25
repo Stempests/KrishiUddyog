@@ -9,6 +9,53 @@ const COMMODITY_HINDI: Record<string, string> = {
   Onion: 'प्याज', Potato: 'आलू', Tomato: 'टमाटर', Turmeric: 'हल्दी',
 };
 
+// Robust helper to parse various Indian date formats (e.g. DD/MM/YYYY) returned by Agmarknet API
+function parseArrivalDate(dateStr: string): Date {
+  if (!dateStr) return new Date();
+  
+  const cleanStr = dateStr.trim();
+  
+  // Format: DD/MM/YYYY
+  if (cleanStr.includes('/')) {
+    const parts = cleanStr.split('/');
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        // YYYY/MM/DD
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        return new Date(year, month, day);
+      } else {
+        // DD/MM/YYYY
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        return new Date(year, month, day);
+      }
+    }
+  }
+
+  // Format: DD-MM-YYYY or YYYY-MM-DD
+  if (cleanStr.includes('-')) {
+    const parts = cleanStr.split('-');
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        // YYYY-MM-DD
+        return new Date(cleanStr);
+      } else {
+        // DD-MM-YYYY
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        return new Date(year, month, day);
+      }
+    }
+  }
+
+  const parsed = new Date(cleanStr);
+  return isNaN(parsed.getTime()) ? new Date() : parsed;
+}
+
 export const mandiService = {
   getPrices: async (params: { commodity?: string; state?: string; district?: string }) => {
     const query: Record<string, string | RegExp> = {};
@@ -50,6 +97,11 @@ export const mandiService = {
       });
 
       const records = response.data.records || [];
+      if (records.length === 0) {
+        logger.warn('Mandi API returned 0 records, falling back to mock prices');
+        return mandiService.getMockPrices(params.state || 'Bihar', params.commodity || 'Wheat');
+      }
+
       const prices = records.map((r: Record<string, string>) => ({
         commodity: r.commodity,
         commodityHindi: COMMODITY_HINDI[r.commodity] || '',
@@ -61,7 +113,7 @@ export const mandiService = {
         maxPrice: parseFloat(r.max_price) || 0,
         modalPrice: parseFloat(r.modal_price) || 0,
         unit: 'Quintal',
-        arrivalDate: new Date(r.arrival_date),
+        arrivalDate: parseArrivalDate(r.arrival_date),
         fetchedAt: new Date(),
       }));
 

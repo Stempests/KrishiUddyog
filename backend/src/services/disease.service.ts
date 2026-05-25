@@ -40,7 +40,7 @@ export const diseaseService = {
     try {
       const uploadResult = await new Promise<{ secure_url: string; public_id: string }>((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
-          { folder: 'krishiuddyog/disease-reports', resource_type: 'image' },
+          { folder: 'agriconnect/disease-reports', resource_type: 'image' },
           (error, result) => {
             if (error || !result) reject(error);
             else resolve(result as { secure_url: string; public_id: string });

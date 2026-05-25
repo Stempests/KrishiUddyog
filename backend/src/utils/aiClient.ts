@@ -26,7 +26,7 @@ export const aiClient = {
   ): Promise<string> => {
     try {
       const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         safetySettings,
         systemInstruction: systemPrompt,
       });
@@ -49,7 +49,7 @@ export const aiClient = {
   vision: async (imageBase64: string, prompt: string, mimeType = 'image/jpeg'): Promise<string> => {
     try {
       const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         safetySettings,
       });
 
@@ -75,7 +75,7 @@ export const aiClient = {
   generateStructured: async <T>(prompt: string): Promise<T> => {
     try {
       const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         safetySettings,
         generationConfig: { responseMimeType: 'application/json' },
       });

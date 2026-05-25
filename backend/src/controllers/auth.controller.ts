@@ -18,10 +18,18 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
+import { v2 as cloudinary } from 'cloudinary';
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
 export const authController = {
   register: asyncHandler(async (req: Request, res: Response) => {
     const result = await authService.register(req.body);
-    sendSuccess(res, result, 'Registration successful! Welcome to KrishiUddyog AI 🌾', 201);
+    sendSuccess(res, result, 'Registration successful! Welcome to AgriConnect India 🌾', 201);
   }),
 
   login: asyncHandler(async (req: Request, res: Response) => {
@@ -35,7 +43,32 @@ export const authController = {
   }),
 
   updateProfile: asyncHandler(async (req: Request, res: Response) => {
-    const user = await authService.updateProfile(req.user!._id, req.body);
+    const updates = { ...req.body };
+    
+    // Check if an image was uploaded
+    if (req.file) {
+      if (process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_KEY !== 'your_cloudinary_api_key') {
+        try {
+          const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+              { folder: 'agriconnect/avatars' },
+              (err, res) => { if (err || !res) reject(err); else resolve(res as { secure_url: string }); }
+            );
+            stream.end(req.file!.buffer);
+          });
+          updates.avatar = result.secure_url;
+        } catch (e) {
+          return sendError(res, 'Failed to upload profile picture', 500);
+        }
+      } else {
+        // Fallback to base64 Data URL if Cloudinary is not set up
+        const base64Image = req.file.buffer.toString('base64');
+        const mimeType = req.file.mimetype;
+        updates.avatar = `data:${mimeType};base64,${base64Image}`;
+      }
+    }
+
+    const user = await authService.updateProfile(req.user!._id, updates);
     sendSuccess(res, user, 'Profile updated successfully');
   }),
 

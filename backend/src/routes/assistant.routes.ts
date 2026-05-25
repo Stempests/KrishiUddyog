@@ -9,8 +9,8 @@ const router = Router();
 
 const chatSchema = z.object({
   message: z.string().min(1).max(1000),
-  language: z.enum(['hi', 'en', 'mr', 'pa', 'bn', 'te', 'ta']).optional(),
-  conversationId: z.string().optional(),
+  language: z.enum(['hi', 'en', 'mr', 'pa', 'bn', 'te', 'ta']).nullable().optional(),
+  conversationId: z.string().nullable().optional(),
 });
 
 router.post('/chat', protect, aiRateLimiter, validateBody(chatSchema), assistantController.chat);

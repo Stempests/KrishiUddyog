@@ -13,6 +13,7 @@ export const validateBody = (schema: ZodSchema) => {
         field: e.path.join('.'),
         message: e.message,
       }));
+      console.error('❌ validateBody Validation Failed:', JSON.stringify(errors, null, 2), 'Request Body:', req.body);
       sendError(res, 'Validation failed', 400, errors);
       return;
     }
